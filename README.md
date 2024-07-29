@@ -7,7 +7,6 @@ Este es un sistema backend para la gestión de eventos, construido con Node.js, 
 - Administración de eventos con categorías
 - Gestión de usuarios con roles y permisos
 
-
 ## Configuración
 
 1. Clona el repositorio
