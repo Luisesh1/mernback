@@ -6,6 +6,14 @@ const EventSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+  logo: {
+    type: String,
+    required: true,
+  },
+  cover: {
+    type: String,
+    required: true,
+  },
   description: {
     type: String,
     required: true,
@@ -27,6 +35,12 @@ const EventSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  subscribers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+});
+
+EventSchema.pre('save', function (next) {
+  this.subscribers = [...new Set(this.subscribers.map(id => id.toString()))];
+  next();
 });
 
 module.exports = mongoose.model('Event', EventSchema);

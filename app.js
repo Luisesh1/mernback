@@ -12,6 +12,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(passport.initialize());
+app.use('/uploads', express.static('uploads'));
 require("./config/passport")(passport);
 app.use("/api/events", eventRoutes);
 app.use("/api/users", userRoutes);

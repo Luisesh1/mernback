@@ -11,15 +11,21 @@ const {
 	getEvent,
 	updateEvent,
 	deleteEvent,
+	subscribeUserToEvent,
+	listUserEvents
 } = require("../controllers/eventController");
+const upload = require('../config/multer');
+let uploadConfig = upload.fields([{ name: 'logo', maxCount: 1 }, { name: 'cover', maxCount: 1 }]);
 
 router.post("/categories", protect, admin, createCategory);
 router.get("/categories", protect, getCategories);
 router.put("/categories/:id", protect, admin, updateCategory);
 router.delete("/categories/:id", protect, admin, deleteCategory);
-router.post("/", protect, organizer, createEvent);
+router.post("/", protect, organizer, uploadConfig, createEvent);
 router.get("/", protect, getEvents);
 router.get("/:id", protect, getEvent);
-router.put("/:id", protect, organizer, updateEvent);
+router.put("/:id", protect, organizer, uploadConfig, updateEvent);
 router.delete("/:id", protect, admin, deleteEvent);
+router.post('/subscribe', protect, subscribeUserToEvent);
+router.get('/:eventId/subscribers', protect, listUserEvents);
 module.exports = router;

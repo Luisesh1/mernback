@@ -1,5 +1,6 @@
 const Event = require('../models/Event');
 const Category = require('../models/Category');
+const User = require('../models/User');
 const Joi = require('joi');
 const { eventSchema } = require('../validations/eventValidation');
 
@@ -71,6 +72,8 @@ exports.createEvent = async (req, res) => {
     if (eventExists) {
       return res.status(400).json({ message: 'Event title already exists' });
     }
+    const logo = req.files['logo'] ? req.files['logo'][0].path : null;
+    const cover = req.files['cover'] ? req.files['cover'][0].path : null;
 
     const event = new Event({
       title,
@@ -79,6 +82,8 @@ exports.createEvent = async (req, res) => {
       date,
       time,
       location,
+      logo,
+      cover
     });
     await event.save();
     res.status(201).json(event);
@@ -115,15 +120,24 @@ exports.getEvent = async (req, res) => {
 exports.updateEvent = async (req, res) => {
   const { id } = req.params;
   const { title, description, category, date, time, location } = req.body;
+  const logo = req.files['logo'] ? req.files['logo'][0].path : null;
+  const cover = req.files['cover'] ? req.files['cover'][0].path : null;
   try {
-    const categoryObj = await Category.findOne({ name: category });
+    const categoryObj = await Category.findOne({ _id: category });
     if (!categoryObj) {
       return res.status(400).json({ message: 'Category does not exist' });
+    }
+    let eventObj = { title, description, category: categoryObj._id, date, time, location }
+    if (logo) {
+      eventObj.logo = logo;
+    }
+    if (cover) {
+      eventObj.cover = cover;
     }
 
     const event = await Event.findByIdAndUpdate(
       id,
-      { title, description, category: categoryObj._id, date, time, location },
+      eventObj,
       { new: true }
     );
     if (!event) {
@@ -145,5 +159,44 @@ exports.deleteEvent = async (req, res) => {
     res.status(200).json({ message: 'Event deleted successfully' });
   } catch (err) {
     res.status(500).json({ message: err.message });
+  }
+};
+
+exports.subscribeUserToEvent = async (req, res) => {
+  const { eventId } = req.body;
+  const {_id} = req.user;
+  
+  try {
+    const user = await User.findById(_id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    const event = await Event.findById(eventId);
+    if (!event) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+    if (user.events?.includes(eventId)) {
+      return res.status(400).json({ message: 'User is already subscribed to this event' });
+    }
+    event.subscribers.push(user._id);
+    await event.save();
+
+    res.status(200).json({ message: 'User subscribed to event successfully.' });
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.listUserEvents = async (req, res) => {
+  const { eventId } = req.params;
+  try {
+    const event = await Event.findById(eventId).populate('subscribers');
+    if (!event) {
+      return res.status(404).json({ message: 'event not found' });
+    }
+    res.status(200).json({ events: event.subscribers });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };
