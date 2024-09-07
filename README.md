@@ -41,7 +41,15 @@ Para configurar y ejecutar el proyecto localmente, sigue estos pasos:
    JWT_SECRET=palabraDeSeguridadMuySegura
    ```
 
-4. **Inicia el Servidor:**
+4. **Ejecuta los seeds:**
+
+   Para cargar registros de prueba ejecuta:
+
+   ```bash
+   node seeds.js
+   ```
+
+5. **Inicia el Servidor:**
 
    Para iniciar el servidor en modo desarrollo, ejecuta:
 
