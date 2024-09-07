@@ -1,8 +1,20 @@
+const Joi = require('joi');
 const Event = require('../models/Event');
 const Category = require('../models/Category');
 const User = require('../models/User');
-const Joi = require('joi');
+const { getIO } = require('../config/sockets');
 const { eventSchema } = require('../validations/eventValidation');
+const io = getIO();
+
+const updateEventCount = async () => {
+  const totalEvents = await Event.countDocuments();
+  io.emit('updateCounts', { totalEvents });
+}
+
+const updateCategoryCount = async () => {
+  const totalCategories = await Category.countDocuments();
+  io.emit('updateCounts', { totalCategories });
+}
 
 
 exports.createCategory = async (req, res) => {
@@ -14,6 +26,7 @@ exports.createCategory = async (req, res) => {
     }
     const category = new Category({ name });
     await category.save();
+    updateCategoryCount();
     res.status(201).json(category);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -50,6 +63,7 @@ exports.deleteCategory = async (req, res) => {
     if (!category) {
       return res.status(404).json({ message: 'Category not found' });
     }
+    updateCategoryCount();
     res.status(200).json({ message: 'Category deleted successfully' });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -86,6 +100,7 @@ exports.createEvent = async (req, res) => {
       cover
     });
     await event.save();
+    updateEventCount();
     res.status(201).json(event);
   } catch (err) {
     if (err.code === 11000) {
@@ -97,10 +112,18 @@ exports.createEvent = async (req, res) => {
 
 exports.getEvents = async (req, res) => {
   try {
-    const events = await Event.find().populate('category');
+    const { eventName, categoryName } = req.query;
+    const filters = {};
+    if (eventName) filters.title = new RegExp(eventName, 'i');
+    if (categoryName) {
+      const category = await Category.findOne({ name: new RegExp(categoryName, 'i') });
+      if (category) filters.category = category._id;
+      else return res.status(200).json([]);
+    }
+    const events = await Event.find(filters).populate('category');
     res.status(200).json(events);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -156,6 +179,7 @@ exports.deleteEvent = async (req, res) => {
     if (!event) {
       return res.status(404).json({ message: 'Event not found' });
     }
+    updateEventCount();
     res.status(200).json({ message: 'Event deleted successfully' });
   } catch (err) {
     res.status(500).json({ message: err.message });

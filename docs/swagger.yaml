@@ -1,0 +1,586 @@
+openapi: 3.0.0
+info:
+  title: Event Management API
+  version: 1.0.0
+  description: API for managing users, events, categories, and subscriptions in an event management system.
+servers:
+  - url: http://localhost:3333/api
+    description: Local server
+
+paths:
+  /users/register:
+    post:
+      summary: Register a new user
+      tags: 
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegister'
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Username or email already exists
+        '500':
+          description: Internal server error
+
+  /users/login:
+    post:
+      summary: Log in a user
+      tags: 
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+      responses:
+        '200':
+          description: User logged in successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Invalid credentials
+        '500':
+          description: Internal server error
+
+  /users:
+    get:
+      summary: Get all users
+      tags: 
+        - Users
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of all users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '403':
+          description: Forbidden - Requires admin role
+        '500':
+          description: Internal server error
+
+  /users/{id}:
+    get:
+      summary: Get a user by ID
+      tags: 
+        - Users
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The user ID
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+        '403':
+          description: Forbidden - Requires admin role
+        '500':
+          description: Internal server error
+
+    put:
+      summary: Update a user by ID
+      tags: 
+        - Users
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The user ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+        '403':
+          description: Forbidden - Requires admin role
+        '500':
+          description: Internal server error
+
+    delete:
+      summary: Delete a user by ID
+      tags: 
+        - Users
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The user ID
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User deleted successfully
+        '404':
+          description: User not found
+        '403':
+          description: Forbidden - Requires admin role
+        '500':
+          description: Internal server error
+
+  /categories:
+    post:
+      summary: Create a new category
+      tags: 
+        - Categories
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Category'
+      responses:
+        '201':
+          description: Category created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        '400':
+          description: Category already exists
+        '500':
+          description: Internal server error
+
+    get:
+      summary: Get all categories
+      tags: 
+        - Categories
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+        '500':
+          description: Internal server error
+
+  /categories/{id}:
+    put:
+      summary: Update a category
+      tags: 
+        - Categories
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The category ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Category'
+      responses:
+        '200':
+          description: Category updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        '404':
+          description: Category not found
+        '500':
+          description: Internal server error
+
+    delete:
+      summary: Delete a category
+      tags: 
+        - Categories
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The category ID
+      responses:
+        '200':
+          description: Category deleted successfully
+        '404':
+          description: Category not found
+        '500':
+          description: Internal server error
+
+  /:
+    post:
+      summary: Create a new event
+      tags: 
+        - Events
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Event'
+      responses:
+        '201':
+          description: Event created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        '400':
+          description: Category does not exist or event title already exists
+        '500':
+          description: Internal server error
+
+    get:
+      summary: Get all events
+      tags: 
+        - Events
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: eventName
+          schema:
+            type: string
+          description: Filter events by name
+        - in: query
+          name: categoryName
+          schema:
+            type: string
+          description: Filter events by category name
+      responses:
+        '200':
+          description: List of events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
+        '500':
+          description: Internal server error
+
+  /{id}:
+    get:
+      summary: Get an event by ID
+      tags: 
+        - Events
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The event ID
+      responses:
+        '200':
+          description: Event details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        '404':
+          description: Event not found
+        '500':
+          description: Internal server error
+
+    put:
+      summary: Update an event
+      tags: 
+        - Events
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The event ID
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Event'
+      responses:
+        '200':
+          description: Event updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        '404':
+          description: Event not found
+        '500':
+          description: Internal server error
+
+    delete:
+      summary: Delete an event
+      tags: 
+        - Events
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The event ID
+      responses:
+        '200':
+          description: Event deleted successfully
+        '404':
+          description: Event not found
+        '500':
+          description: Internal server error
+
+  /subscribe:
+    post:
+      summary: Subscribe a user to an event
+      tags: 
+        - Subscriptions
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                eventId:
+                  type: string
+                  example: 60d0fe4f5311236168a109ca
+              required:
+                - eventId
+      responses:
+        '200':
+          description: User subscribed to event successfully
+        '400':
+          description: User is already subscribed to this event
+        '404':
+          description: User or event not found
+        '500':
+          description: Internal server error
+
+  /{eventId}/subscribers:
+    get:
+      summary: List all subscribers of an event
+      tags: 
+        - Subscriptions
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: eventId
+          required: true
+          schema:
+            type: string
+          description: The event ID
+      responses:
+        '200':
+          description: List of subscribers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '404':
+          description: Event not found
+        '500':
+          description: Internal server error
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    UserRegister:
+      type: object
+      properties:
+        username:
+          type: string
+          example: johndoe
+        email:
+          type: string
+          example: johndoe@example.com
+        password:
+          type: string
+          example: password123
+        role:
+          type: string
+          enum: 
+            - ticket_office
+            - organizer
+            - participant
+          default: participant
+          example: participant
+      required:
+        - username
+        - email
+        - password
+
+    UserLogin:
+      type: object
+      properties:
+        email:
+          type: string
+          example: johndoe@example.com
+        password:
+          type: string
+          example: password123
+      required:
+        - email
+        - password
+
+    UserUpdate:
+      type: object
+      properties:
+        username:
+          type: string
+          example: johndoe
+        email:
+          type: string
+          example: johndoe@example.com
+        role:
+          type: string
+          enum: 
+            - ticket_office
+            - organizer
+            - participant
+          example: organizer
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 60d0fe4f5311236168a109ca
+        username:
+          type: string
+          example: johndoe
+        email:
+          type: string
+          example: johndoe@example.com
+        role:
+          type: string
+          enum: 
+            - ticket_office
+            - organizer
+            - participant
+          example: participant
+
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+
+    Category:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 60d0fe4f5311236168a109cb
+        name:
+          type: string
+          example: Music
+      required:
+        - name
+
+    Event:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 60d0fe4f5311236168a109ca
+        title:
+          type: string
+          example: Jazz Night
+        description:
+          type: string
+          example: A night full of Jazz music
+        category:
+          type: string
+          example: 60d0fe4f5311236168a109cb
+        date:
+          type: string
+          format: date
+          example: 2024-09-12
+        time:
+          type: string
+          example: 19:00
+        location:
+          type: string
+          example: New York City
+        logo:
+          type: string
+          format: binary
+        cover:
+          type: string
+          format: binary
+      required:
+        - title
+        - description
+        - category
+        - date
+        - time
+        - location
