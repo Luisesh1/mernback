@@ -17,7 +17,7 @@ const {
 const upload = require('../config/multer');
 let uploadConfig = upload.fields([{ name: 'logo', maxCount: 1 }, { name: 'cover', maxCount: 1 }]);
 
-router.post("/categories", protect, admin, createCategory);
+router.post("/categories", protect, organizer, createCategory);
 router.get("/categories", protect, getCategories);
 router.put("/categories/:id", protect, admin, updateCategory);
 router.delete("/categories/:id", protect, admin, deleteCategory);
