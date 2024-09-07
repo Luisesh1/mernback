@@ -76,11 +76,3 @@ npm test
 - **`routes/`**: Definición de rutas para la API.
 - **`validations/`**: Validaciones de datos con Joi para asegurar la integridad de las entradas.
 
-## 📜 Licencia
-
-Este proyecto está bajo la licencia MIT. Consulta el archivo [LICENSE](LICENSE) para más detalles.
-
----
-
-¡Gracias por usar el Sistema de Gestión de Eventos! Si tienes alguna pregunta o comentario, no dudes en abrir un [issue](https://github.com/tuusuario/tu-repositorio/issues) en el repositorio.
-
