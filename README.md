@@ -14,23 +14,23 @@ Para configurar y ejecutar el proyecto localmente, sigue estos pasos:
 
 1. **Clona el Repositorio:**
 
-   \`\`\`bash
-   git clone https://github.com/tuusuario/tu-repositorio.git
-   \`\`\`
+   ```bash
+   git clone https://github.com/Luisesh1/mernback
+   ```
 
 2. **Instala las Dependencias:**
 
    Navega al directorio del proyecto y ejecuta:
 
-   \`\`\`bash
+   ```bash
    npm install
-   \`\`\`
+   ```
 
 3. **Configura las Variables de Entorno:**
 
-   Crea un archivo \`.env\` en la raíz del proyecto con el siguiente contenido:
+   Crea un archivo `.env` en la raíz del proyecto con el siguiente contenido:
 
-   \`\`\`plaintext
+   ```plaintext
    HOST=localhost
    PORT=3333
    MONGO_USER=admin
@@ -39,34 +39,34 @@ Para configurar y ejecutar el proyecto localmente, sigue estos pasos:
    MONGO_PORT=27017
    MONGO_DATABASE=eventManagement
    JWT_SECRET=palabraDeSeguridadMuySegura
-   \`\`\`
+   ```
 
 4. **Inicia el Servidor:**
 
    Para iniciar el servidor en modo desarrollo, ejecuta:
 
-   \`\`\`bash
+   ```bash
    npm start
-   \`\`\`
+   ```
 
-   El servidor estará corriendo en \`http://localhost:3333\`.
+   El servidor estará corriendo en `http://localhost:3333`.
 
 ## 🧪 Pruebas
 
 Para ejecutar el conjunto de pruebas y asegurarte de que todo funcione correctamente, utiliza:
 
-\`\`\`bash
+```bash
 npm test
-\`\`\`
+```
 
 ## 📂 Estructura del Proyecto
 
-- **\`config/\`**: Configuración del sistema, incluyendo la conexión a MongoDB y la configuración de Passport para la autenticación.
-- **\`controllers/\`**: Controladores que manejan la lógica de negocio para eventos y usuarios.
-- **\`middlewares/\`**: Middlewares de autenticación, manejo de errores y otros procesos intermedios.
-- **\`models/\`**: Modelos de datos utilizando Mongoose.
-- **\`routes/\`**: Definición de rutas para la API.
-- **\`validations/\`**: Validaciones de datos con Joi para asegurar la integridad de las entradas.
+- **`config/`**: Configuración del sistema, incluyendo la conexión a MongoDB y la configuración de Passport para la autenticación.
+- **`controllers/`**: Controladores que manejan la lógica de negocio para eventos y usuarios.
+- **`middlewares/`**: Middlewares de autenticación, manejo de errores y otros procesos intermedios.
+- **`models/`**: Modelos de datos utilizando Mongoose.
+- **`routes/`**: Definición de rutas para la API.
+- **`validations/`**: Validaciones de datos con Joi para asegurar la integridad de las entradas.
 
 ## 📜 Licencia
 
